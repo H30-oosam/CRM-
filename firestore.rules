@@ -5,6 +5,18 @@ service cloud.firestore {
     function isSignedIn() { return request.auth != null; }
     function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
     
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && getRole() == 'Admin';
+    }
+    
+    function isManager() {
+      return isSignedIn() && (getRole() == 'Sales Manager' || getRole() == 'Admin' || getRole() == 'Super Admin');
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;
@@ -12,12 +24,14 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isSignedIn();
-      allow write: if isOwner(userId);
+      // Only Admins can change roles
+      allow create: if isOwner(userId);
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
     }
 
     match /companies/{companyId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn(); // Basic protection: must be logged in
+      allow write: if isManager();
     }
 
     match /contacts/{contactId} {
@@ -42,7 +56,7 @@ service cloud.firestore {
 
     match /invoices/{invId} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn();
+      allow write: if isManager();
     }
 
     match /leads/{leadId} {

@@ -38,8 +38,6 @@ async function startServer() {
       const { prompt, context } = req.body;
       if (!prompt) return res.status(400).json({ error: "Prompt is required" });
 
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
       const systemPrompt = `
         You are a high-level CRM Consultant and AI Assistant for "HossamElwardany CRM".
         Context: ${JSON.stringify(context)}
@@ -53,10 +51,12 @@ async function startServer() {
         Always prioritize professional tone and accuracy. Support Arabic & English.
       `;
 
-      const result = await model.generateContent([systemPrompt, prompt]);
-      const responseText = result.response.text();
+      const result = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\nUser Request: ${prompt}` }] }]
+      });
       
-      res.json({ success: true, text: responseText });
+      res.json({ success: true, text: result.text });
     } catch (error: any) {
       console.error("Gemini AI Error:", error);
       res.status(500).json({ error: "AI Processing Failed" });
@@ -81,6 +81,36 @@ async function startServer() {
   apiRouter.post("/webhooks/whatsapp", (req, res) => {
     console.log("Received WhatsApp Webhook:", req.body);
     res.status(200).send("EVENT_RECEIVED");
+  });
+
+  // WhatsApp Sync Logic
+  apiRouter.post("/whatsapp/sync", async (req, res) => {
+    try {
+      const { userId } = req.body;
+      console.log(`Starting WhatsApp sync for user: ${userId}`);
+      
+      // Simulate fetching data from Meta Graph API
+      const mockLeads = [
+        { id: Date.now().toString(), name: "John From WhatsApp", source: "WhatsApp", score: 75, status: "New" },
+        { id: (Date.now() + 1).toString(), name: "Laila CRM Inbound", source: "WhatsApp", score: 88, status: "New" }
+      ];
+
+      res.json({ 
+        success: true, 
+        message: "Sync completed successfully", 
+        leadsFound: mockLeads.length,
+        data: mockLeads 
+      });
+    } catch (error) {
+      res.status(500).json({ error: "WhatsApp Sync Failed" });
+    }
+  });
+
+  // Role Management (Admin Only check would be here in a real production environment)
+  apiRouter.post("/admin/update-role", (req, res) => {
+    const { targetUserId, newRole } = req.body;
+    console.log(`Updating role for ${targetUserId} to ${newRole}`);
+    res.json({ success: true, message: `User role updated to ${newRole}` });
   });
 
   // Public Health Check

@@ -13,6 +13,8 @@
         "department": { "type": "string" },
         "status": { "type": "string", "enum": ["active", "inactive"] },
         "lastLogin": { "type": "string", "format": "date-time" },
+        "whatsappConnected": { "type": "boolean" },
+        "lastSync": { "type": "string", "format": "date-time" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["uid", "email", "role"]
