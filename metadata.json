@@ -1,0 +1,8 @@
+{
+  "name": "HossamElwardany CRM",
+  "description": "Professional SaaS CRM & Sales Management system with AI insights, WhatsApp integration, and multi-language support (Arabic/English).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

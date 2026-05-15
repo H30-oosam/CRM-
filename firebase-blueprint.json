@@ -1,0 +1,149 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user / Employee",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["Super Admin", "Admin", "HR", "Sales Manager", "Sales Employee", "Viewer"] },
+        "department": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "lastLogin": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Company": {
+      "title": "Company",
+      "description": "A business entity/client",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "logo": { "type": "string" },
+        "industry": { "type": "string" },
+        "website": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "notes": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name"]
+    },
+    "Contact": {
+      "title": "Contact",
+      "description": "An individual associated with a company",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "jobTitle": { "type": "string" },
+        "companyId": { "type": "string" },
+        "linkedIn": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email"]
+    },
+    "Deal": {
+      "title": "Deal",
+      "description": "A sales opportunity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "value": { "type": "number" },
+        "currency": { "type": "string" },
+        "stage": { "type": "string", "enum": ["New Lead", "Contacted", "Proposal Sent", "Negotiation", "Won", "Lost"] },
+        "probability": { "type": "number" },
+        "companyId": { "type": "string" },
+        "contactId": { "type": "string" },
+        "assignedTo": { "type": "string" },
+        "notes": { "type": "string" },
+        "expectedCloseDate": { "type": "string", "format": "date" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "stage", "value"]
+    },
+    "Activity": {
+      "title": "Activity",
+      "description": "Actions taken (call, email, meeting, etc.)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["Call", "Meeting", "Email", "WhatsApp", "LinkedIn", "Task"] },
+        "status": { "type": "string", "enum": ["Completed", "Pending", "Cancelled"] },
+        "subject": { "type": "string" },
+        "notes": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "assignedTo": { "type": "string" },
+        "relatedTo": { "type": "object", "properties": { "type": { "type": "string" }, "id": { "type": "string" } } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "date"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Internal work items for employees",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { "type": "string", "enum": ["Low", "Medium", "High", "Urgent"] },
+        "status": { "type": "string", "enum": ["Todo", "In Progress", "Review", "Done"] },
+        "deadline": { "type": "string", "format": "date-time" },
+        "assignedTo": { "type": "string" },
+        "dealId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Financial billing documents",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "number": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Paid", "Pending", "Overdue"] },
+        "dueDate": { "type": "string", "format": "date" },
+        "dealId": { "type": "string" },
+        "companyId": { "type": "string" }
+      }
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Prospect before turning into a deal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "source": { "type": "string", "enum": ["Facebook", "Website", "WhatsApp", "LinkedIn", "Referral"] },
+        "score": { "type": "number" },
+        "status": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "users": { "schema": "User", "description": "Users and their profiles" },
+    "companies": { "schema": "Company", "description": "Client companies" },
+    "contacts": { "schema": "Contact", "description": "Contacts related to companies" },
+    "deals": { "schema": "Deal", "description": "Sales deals in pipeline" },
+    "activities": { "schema": "Activity", "description": "Tasks, meetings, and history" },
+    "tasks": { "schema": "Task", "description": "Employee task management" },
+    "invoices": { "schema": "Invoice", "description": "Billing and receipts" },
+    "leads": { "schema": "Lead", "description": "Incoming sales prospects" },
+    "notifications": { "schema": "object", "description": "Real-time alerts for users" }
+  }
+}
